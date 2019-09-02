@@ -227,4 +227,67 @@
 ;; On the otherhand, an interpreter using applicative order will attempt to evaluate (p) before passing it as an argument.
 
 
+;; 1.1.7 Example: Square Roots by Newton's method
+
+;; * Procedures, as introduced above are much like ordinary mathematical functions, in that they specify a value determined by one or more parameters.
+;; * One important difference: Procedures must be effective.
+;; * In mathematics we can define the square-root function as:
+;;     "the square root of x equals the y such that y is greater than or equal to zero and y squared is equal to x"
+;; * This does not describe a procedure, the difference being the contained in the distinction between declarative and imperative knowledge.
+;; A procedure must contain a description of how to arrive at something.
+
+;; The most common way to compute square roots is to use Newton's method of successive approximation, which says that whenever we have a guess y for the value of the square root, we can perform a simple manipulation to arrive at a better guess by averaging y with with the radicand divided by y.
+
+(define (average x y)
+    (/ (+ x y) 2))
+
+(define (improve guess x)
+    (average guess (/ x guess))) ; encapsulates the logic of improving the guess
+
+(define (good-enough? guess x)
+    (< (abs (- (square guess) x)) 0.0001)) ; whether the guess squared is within a arbitrary tolerance on either side of the radicand. 
+
+(define (sqrt-iter guess x)
+    (if (good-enough? guess x)
+        guess
+        (sqrt-iter (improve guess x) x)))
+
+(define (sqrt x)
+    (sqrt-iter 1.0 x)) ; initialise sqrt-iter recursive loop with guess of one.
+
+;; * This is an extremely common pattern in functional languages for using recursion where other languages might using special looping constructs.
+
+
+;; Exercise 1.6
+;; What would happen if instead of using if within the iterative loop, we used a function that redefined if using cond?
+;; Like in one of the previous question, redefining if this way would require that any branches would have to be evaluated before being passed into the function as an argument, and a recursive function like this would loop indefinitely.
+
+;; Exercise 1.7
+;; Explain:
+;; - The good-enough? test will not be effective for finding square-roots of small numbers.
+;;     Tolerance is arbitrary and does not scale with the size of inputs. 
+;; - In real computers arithmatic operations must take place within a certain precision, and so it will be unsuitable for large numbers.
+;;     The precision of numbers which can be represented in programming is space limited. Very large numbers may have enough digits that it requires all or nearly all of the bits to represent even the non-fractional portion of the number. The for every digit after the decimal point in the tolerance the maximum whole number we can operate on with any precision must be divided by 10 to the x where x is the number of spaces.
+
+
+;; 1.1.8 Procedures as Black-Box Abtractions.
+
+;; * "sqrt" is an example of a process defined by a set of mutually defined procedures.
+;; * Also notice that the definition of sqrt-iter is recursive.
+;; * Observe that the problem of computing square roots breaks up naturally into a number of subproblems.
+;; * The entire sqrt program can be viewed as a cluster of procedures that "mirrors the decomposition of the problem into subproblems."
+;; * The importance of this decomposition strategy is not simply that that one is dividing the problem into parts, it is crucial that each procedure accomplishes a identifiable task that can be used as a module.
+;; * Once defined, procedures that themselves make use of the procedure do not need to know anything about its implementation.
+;; * The procedure is a "procedural abstraction."
+;; * At a certain level of abstraction, any procedure which does the same thing is equally good.
+;; * Thus a procedure definition should be able to suppress detail.
+
+;; Local Names
+
+;; * One detail that should not matter to the user of the procedure is the implementer's choice of names for the formal parameters.
+;; * That is, the paramter names should be local to the procedure.
+;; * A formal parameter of the procedure has a very special role in the procedure definition in that it doesn't matter what name the parameter has.
+;; * Such a name is called a **bound variable** and we say that the procedure **binds** it's formal parameters.
+;; * If a variable is not bound, we say that it is **free**. 
+
 
